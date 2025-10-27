@@ -1,0 +1,8 @@
+streamlit
+langchain==0.3.27
+langchain-core==0.3.79
+langchain-openai
+pypdf
+pinecone
+langchain-pinecone==0.2.12
+langchain-text-splitters
