@@ -5,7 +5,8 @@ from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from summary import generate_pdf_summary_prompt
 from citation import generate_pdf_citation_prompt
 from upload import upload_pdf
-from rag import generate_rag_runnable_chain
+# from rag import generate_rag_runnable_chain
+from function_tools import get_fosrc_answer
 
 @st.dialog("Ask FOSRC")
 def ask_fosrc():
@@ -13,18 +14,16 @@ def ask_fosrc():
     user_question = st.text_area(
         label="Question:",
         height=200,
-        max_chars=200
+        max_chars=400
     )
     if st.button("Submit"):
 
         with st.spinner("Processing"):
 
-            chain = generate_rag_runnable_chain() | get_open_ai_client()
-
-            response = chain.invoke(user_question)
+            response = get_fosrc_answer(user_question)
 
             # Append the assistant's full response to the 'messages' list
-            st.session_state.messages.append({"role": "assistant", "content": response.content})
+            st.session_state.messages.append({"role": "assistant", "content": response})
 
             st.rerun()
 
@@ -140,7 +139,7 @@ def initialize_session_state():
 
     # Setting up the OpenAI model in session state if it is not already defined
     if "openai_model" not in st.session_state:
-        st.session_state["openai_model"] = "gpt-4o-mini"
+        st.session_state["openai_model"] = st.secrets["GPT_MODEL"]
 
     # Initializing the 'chat_history_summary' key in the session state 
     if "chat_history_summary" not in st.session_state:
