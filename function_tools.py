@@ -360,7 +360,7 @@ def get_rag_response(user_question):
 
     messages = [{"role": "system", "content": generated_prompt.to_string()}]
 
-    response = get_open_ai_response(messages)
+    response = get_open_ai_response(messages=messages, use_tools=False)
 
     return response
 
@@ -382,24 +382,32 @@ get_rag_response_function = {
 }
 
 
-def get_open_ai_response(messages):
+def get_open_ai_response(messages = [], use_tools = True):
     openai = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-    return openai.chat.completions.create(
-        model=st.secrets["GPT_MODEL"],
-        # Optional setting for maximum tokens allowed for the response
-        max_tokens=1000,
+    if use_tools:
+        return openai.chat.completions.create(
+            model=st.secrets["GPT_MODEL"],
+            # Optional setting for maximum tokens allowed for the response
+            max_tokens=1000,
 
-        # Optional setting for temperature; default is 1; temperature
-        # can be set up to 2 for more answer randomness/creativity
-        temperature=1,
+            # Optional setting for temperature; default is 1; temperature
+            # can be set up to 2 for more answer randomness/creativity
+            temperature=1,
 
-        messages=messages,
-        tools=[
-            {"type": "function", "function": get_search_results_count_function},
-            {"type": "function", "function": get_search_results_function},
-            {"type": "function", "function": get_rag_response_function},
-        ]
-    )
+            messages=messages,
+            tools=[
+                {"type": "function", "function": get_search_results_count_function},
+                {"type": "function", "function": get_search_results_function},
+                {"type": "function", "function": get_rag_response_function},
+            ]
+        )
+    else:
+        return openai.chat.completions.create(
+            model=st.secrets["GPT_MODEL"],
+            max_tokens=1000,
+            temperature=1,
+            messages=messages
+        )
 
 def handle_tool_calls(message):
     responses = []
@@ -475,7 +483,7 @@ def handle_tool_calls(message):
 
 def get_fosrc_answer(user_question):
     messages = [{"role": "system", "content": system_message}] + [{"role": "user", "content": user_question}]
-    response = get_open_ai_response(messages)
+    response = get_open_ai_response(messages=messages)
 
     print(response)
 
@@ -484,6 +492,6 @@ def get_fosrc_answer(user_question):
         responses = handle_tool_calls(message)
         messages.append(message)
         messages.extend(responses)
-        response = get_open_ai_response(messages)
+        response = get_open_ai_response(messages=messages)
     
     return response.choices[0].message.content
