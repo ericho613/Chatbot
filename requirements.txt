@@ -6,3 +6,7 @@ pypdf
 pinecone
 langchain-pinecone==0.2.12
 langchain-text-splitters
+bs4
+selenium
+webdriver-manager
+dotenv
