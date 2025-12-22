@@ -1,0 +1,23 @@
+version: "5.0.1"
+services:
+  chatbot:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      # args:
+      #   key: value
+    ports:
+      - '8501:8501'
+    # environment: 
+      # - OPENAI_API_KEY=
+      # - PINECONE_API_KEY=
+      # - FOSRC_SERVER_LINK=https://qa-ospr.g.ent.cloud-nuage.canada.ca
+      # - GPT_MODEL=gpt-4o-mini
+      # - DEPLOYMENT_ENVIRONMENT=development
+    # volumes: 
+    #   # named volume for logs
+    #   - logs:/logs
+    env_file: 
+      - ./.env
+# volumes: 
+#   logs:
