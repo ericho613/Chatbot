@@ -3,12 +3,17 @@ from langchain_text_splitters.character import CharacterTextSplitter
 from langchain_openai.embeddings import OpenAIEmbeddings
 from langchain_pinecone import PineconeVectorStore
 import time
-import streamlit as st
+# import streamlit as st
 from pypdf import PdfReader
+import os
+from dotenv import load_dotenv
+
+if os.getenv("DEPLOYMENT_ENVIRONMENT", "development") != "production":
+    load_dotenv()
 
 def upload_pdf(pdf_file, citation):
 
-    pc = Pinecone(api_key=st.secrets["PINECONE_API_KEY"])
+    pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
 
     index_name = "pdf-index"
 
@@ -48,7 +53,7 @@ def upload_pdf(pdf_file, citation):
     # Splitting the original PDF file into chunks of text
     char_split_text = char_splitter.split_text(full_pdf_text)
 
-    embedding = OpenAIEmbeddings(model = "text-embedding-3-small", openai_api_key=st.secrets["OPENAI_API_KEY"])
+    embedding = OpenAIEmbeddings(model = "text-embedding-3-small", openai_api_key=os.getenv("OPENAI_API_KEY"))
 
     index = pc.Index(index_name)
 
