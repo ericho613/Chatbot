@@ -7,6 +7,13 @@ from citation import generate_pdf_citation_prompt
 from upload import upload_pdf
 # from rag import generate_rag_runnable_chain
 from function_tools import get_fosrc_answer
+import os
+from dotenv import load_dotenv
+
+if os.getenv("DEPLOYMENT_ENVIRONMENT", "development") != "production":
+    load_dotenv()
+
+my_variable = os.environ.get('MY_VARIABLE', 'Default Value if not set')
 
 @st.dialog("Ask FOSRC")
 def ask_fosrc():
@@ -130,7 +137,7 @@ def get_open_ai_client():
     # Optional api_key parameter if you prefer to pass api key in 
     # directly instead of loading environment variables
     # Fetching the OPENAI_API_KEY environment variable from the secrets.toml file
-    api_key=st.secrets["OPENAI_API_KEY"],  
+    api_key=os.getenv("OPENAI_API_KEY"),  
     )
 
     return client
@@ -139,7 +146,7 @@ def initialize_session_state():
 
     # Setting up the OpenAI model in session state if it is not already defined
     if "openai_model" not in st.session_state:
-        st.session_state["openai_model"] = st.secrets["GPT_MODEL"]
+        st.session_state["openai_model"] = os.getenv("GPT_MODEL")
 
     # Initializing the 'chat_history_summary' key in the session state 
     if "chat_history_summary" not in st.session_state:
