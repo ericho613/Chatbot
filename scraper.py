@@ -20,7 +20,8 @@ from concurrent.futures import ThreadPoolExecutor
 
 from bs4 import BeautifulSoup
 
-load_dotenv()
+if os.getenv("DEPLOYMENT_ENVIRONMENT", "development") != "production":
+    load_dotenv()
 
 class ScrapedWebPage:
     def __init__(self, url):
