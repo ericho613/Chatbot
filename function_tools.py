@@ -3,7 +3,12 @@ from openai import OpenAI
 import requests
 from urllib.parse import quote_plus, urlencode
 from rag import generate_rag_runnable_chain
-import streamlit as st
+# import streamlit as st
+import os
+from dotenv import load_dotenv
+
+if os.getenv("DEPLOYMENT_ENVIRONMENT", "development") != "production":
+    load_dotenv()
 
 system_message = """
 You are a helpful assistant for the Federal Open Science Repository of Canada (FOSRC). Always be accurate. If you don't know the answer, say so. Do not add any of the following search filters unless specified by the user: size filter, search query filter, the authors filter, the subjects filter, the min date filter, the max date filter, the communities filter, and the item types filter.
@@ -31,7 +36,7 @@ def custom_title_capitalization(text_string, no_caps_list=None):
 def get_search_results_count(search_query, authors, subjects, min_date, max_date, item_types, communities):
     print(f"get_search_results_count() called for search term: {search_query}")
     
-    url = st.secrets["FOSRC_SERVER_LINK"] + "/server/api/discover/search/objects"
+    url = os.getenv("FOSRC_SERVER_LINK") + "/server/api/discover/search/objects"
 
     params = {
         "sort": "score,DESC",
@@ -186,7 +191,7 @@ get_search_results_count_function = {
 def get_search_results(size, search_query, authors, subjects, min_date, max_date, item_types, communities):
     print(f"get_search_results_count() called for search term: {search_query}")
     
-    url = st.secrets["FOSRC_SERVER_LINK"] + "/server/api/discover/search/objects"
+    url = os.getenv("FOSRC_SERVER_LINK") + "/server/api/discover/search/objects"
 
     params = {
         "sort": "score,DESC",
@@ -253,7 +258,7 @@ def get_search_results(size, search_query, authors, subjects, min_date, max_date
             modified_result = {
                 "title": result.get("_embedded").get("indexableObject").get("name"),
                 # "abstract": result.get("_embedded").get("indexableObject").get("metadata").get("dc.description.abstract", [])[0].get("value"),
-                "link": (st.secrets["FOSRC_SERVER_LINK"] + "/items/" + result.get("_embedded").get("indexableObject").get("id")) if result.get("_embedded").get("indexableObject").get("id", "") else "",
+                "link": (os.getenv("FOSRC_SERVER_LINK") + "/items/" + result.get("_embedded").get("indexableObject").get("id")) if result.get("_embedded").get("indexableObject").get("id", "") else "",
             }
             modified_results_list.append(str(modified_result))
 
@@ -383,10 +388,10 @@ get_rag_response_function = {
 
 
 def get_open_ai_response(messages = [], use_tools = True):
-    openai = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+    openai = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
     if use_tools:
         return openai.chat.completions.create(
-            model=st.secrets["GPT_MODEL"],
+            model=os.getenv("GPT_MODEL"),
             # Optional setting for maximum tokens allowed for the response
             max_tokens=1000,
 
@@ -403,7 +408,7 @@ def get_open_ai_response(messages = [], use_tools = True):
         )
     else:
         return openai.chat.completions.create(
-            model=st.secrets["GPT_MODEL"],
+            model=os.getenv("GPT_MODEL"),
             max_tokens=1000,
             temperature=1,
             messages=messages
