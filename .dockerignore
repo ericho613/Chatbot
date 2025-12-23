@@ -6,3 +6,4 @@ venv
 .git
 .gitignore
 Dockerfile
+readme.md
