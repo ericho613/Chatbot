@@ -11,9 +11,12 @@ from dotenv import load_dotenv
 if os.getenv("DEPLOYMENT_ENVIRONMENT", "development") != "production":
     load_dotenv()
 
+openai_api_key = os.getenv("OPENAI_API_KEY")
+pinecone_api_key = os.getenv("PINECONE_API_KEY")
+
 def upload_pdf(pdf_file, citation):
 
-    pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
+    pc = Pinecone(api_key=pinecone_api_key)
 
     index_name = "pdf-index"
 
@@ -53,7 +56,7 @@ def upload_pdf(pdf_file, citation):
     # Splitting the original PDF file into chunks of text
     char_split_text = char_splitter.split_text(full_pdf_text)
 
-    embedding = OpenAIEmbeddings(model = "text-embedding-3-small", openai_api_key=os.getenv("OPENAI_API_KEY"))
+    embedding = OpenAIEmbeddings(model = "text-embedding-3-small", openai_api_key=openai_api_key)
 
     index = pc.Index(index_name)
 

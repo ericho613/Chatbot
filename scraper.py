@@ -23,6 +23,10 @@ from bs4 import BeautifulSoup
 if os.getenv("DEPLOYMENT_ENVIRONMENT", "development") != "production":
     load_dotenv()
 
+openai_api_key = os.getenv("OPENAI_API_KEY")
+pinecone_api_key = os.getenv("PINECONE_API_KEY")
+fosrc_server_link = os.getenv("FOSRC_SERVER_LINK")
+
 class ScrapedWebPage:
     def __init__(self, url):
 
@@ -87,7 +91,7 @@ async def upload_all_scraped_webpages(scraped_web_pages_list: list[ScrapedWebPag
 
     print(f"Starting upload to Pinecone.")
 
-    pc = Pinecone(api_key=os.environ.get("PINECONE_API_KEY"))
+    pc = Pinecone(api_key=pinecone_api_key)
 
     index_name = "pdf-index"
 
@@ -115,7 +119,7 @@ async def upload_all_scraped_webpages(scraped_web_pages_list: list[ScrapedWebPag
         chunk_overlap  = 0
     )
 
-    embedding = OpenAIEmbeddings(model = "text-embedding-3-small", openai_api_key=os.environ.get("OPENAI_API_KEY"))
+    embedding = OpenAIEmbeddings(model = "text-embedding-3-small", openai_api_key=openai_api_key)
 
     index = pc.Index(index_name)
     
@@ -140,7 +144,7 @@ async def upload_all_scraped_webpages(scraped_web_pages_list: list[ScrapedWebPag
 
 async def main():
 
-    parent_sitemap_response = requests.get(os.environ.get("FOSRC_SERVER_LINK") + '/sitemap_index.html')
+    parent_sitemap_response = requests.get(fosrc_server_link + '/sitemap_index.html')
 
     #BeautifulSoup allows us to parse html; in other words, 
     # we can use beautiful soup to convert a html string value

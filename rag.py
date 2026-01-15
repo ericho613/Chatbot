@@ -11,9 +11,12 @@ from dotenv import load_dotenv
 if os.getenv("DEPLOYMENT_ENVIRONMENT", "development") != "production":
     load_dotenv()
 
+openai_api_key = os.getenv("OPENAI_API_KEY")
+pinecone_api_key = os.getenv("PINECONE_API_KEY")
+
 def generate_rag_runnable_chain():
 
-    pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
+    pc = Pinecone(api_key=pinecone_api_key)
 
     index_name = "pdf-index"
 
@@ -32,7 +35,7 @@ def generate_rag_runnable_chain():
             time.sleep(1)
 
 
-    embedding = OpenAIEmbeddings(model = "text-embedding-3-small", openai_api_key=os.getenv("OPENAI_API_KEY"))
+    embedding = OpenAIEmbeddings(model = "text-embedding-3-small", openai_api_key=openai_api_key)
 
     index = pc.Index(index_name)
 
